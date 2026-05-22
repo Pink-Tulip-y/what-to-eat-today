@@ -1,0 +1,17 @@
+{
+  "name": "what-to-eat-today",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "npm --prefix client run dev",
+    "dev:server": "npm --prefix server run dev",
+    "build": "npm run build:client && npm run copy:public",
+    "build:client": "npm --prefix client run build",
+    "copy:public": "node -e \"const{cpSync,existsSync,mkdirSync}=require('fs');const p='server/public';if(!existsSync(p))mkdirSync(p,{recursive:true});cpSync('client/dist',p,{recursive:true});console.log('OK')\"",
+    "start": "npm --prefix server run start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

@@ -1,0 +1,796 @@
+/* ===== 页面容器 ===== */
+.page {
+  padding: 24px 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  animation: pageIn 0.28s ease-out;
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+/* ===== 位置输入 ===== */
+.location-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.location-input {
+  flex: 1;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.location-input:focus {
+  border-color: var(--primary);
+}
+
+/* ===== 位置搜索下拉 ===== */
+.search-wrapper {
+  position: relative;
+}
+
+.search-spinner {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.suggestions-dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  z-index: 100;
+  max-height: 260px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 4px 0;
+}
+
+.suggestion-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: background 0.15s;
+}
+
+.suggestion-item:hover {
+  background: var(--primary-light);
+}
+
+.suggestion-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.suggestion-addr {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.selected-hint {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--success);
+  font-weight: 600;
+}
+
+.btn {
+  padding: 14px 24px;
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-primary:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.btn-outline {
+  background: #fff;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.btn-outline:hover {
+  background: var(--primary-light);
+}
+
+.btn-large {
+  width: 100%;
+  padding: 16px;
+  font-size: 18px;
+}
+
+/* ===== 忌口问卷 ===== */
+.dietary-section h3 {
+  font-size: 17px;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.dietary-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.dietary-tag {
+  padding: 10px 18px;
+  border: 2px solid var(--border);
+  border-radius: 24px;
+  background: #fff;
+  font-size: 14px;
+  color: var(--text);
+  transition: all 0.2s;
+}
+
+.dietary-tag.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.dietary-tag-other {
+  border-style: dashed;
+  color: var(--text-secondary);
+}
+
+.custom-input-row {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.custom-input {
+  width: 140px;
+  padding: 10px 14px;
+  border: 2px solid var(--primary);
+  border-radius: 24px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+
+/* ===== 转盘 ===== */
+.wheel-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 0 20px;
+}
+
+.wheel-wrapper {
+  position: relative;
+  width: 300px;
+  height: 300px;
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 28px solid var(--primary);
+  z-index: 10;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.wheel-svg {
+  width: 300px;
+  height: 300px;
+  transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+}
+
+.wheel-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--primary);
+}
+
+.spin-btn {
+  margin-top: 16px;
+  padding: 14px 48px;
+  border-radius: 30px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+
+.spin-btn:hover {
+  background: var(--primary-dark);
+}
+
+.spin-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* ===== 类别确认 ===== */
+.category-result {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 16px 40px;
+  border-radius: 24px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.category-guess {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+}
+
+.confirm-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.confirm-buttons .btn {
+  flex: 1;
+}
+
+/* ===== 外卖列表 ===== */
+.restaurant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.restaurant-list-header {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.result-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.result-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.result-card-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.result-card-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.stat-rating {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.stat-sales {
+  color: var(--text-secondary);
+}
+
+.stat-distance {
+  color: var(--text-secondary);
+}
+
+.platform-compare {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.platform-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.platform-row + .platform-row {
+  border-top: 1px dashed var(--border);
+}
+
+.platform-name {
+  font-weight: 600;
+  width: 70px;
+}
+
+.platform-price {
+  font-weight: 600;
+}
+
+.platform-price.cheapest {
+  color: var(--success);
+  font-size: 16px;
+}
+
+.platform-discount {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.cheapest-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--success-bg);
+  color: var(--success);
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.platform-delivery {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+/* ===== 空状态 ===== */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+/* ===== 返回按钮 ===== */
+.back-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 4px 0;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.back-btn:hover {
+  background: var(--border);
+}
+
+/* ===== 加载状态 ===== */
+.loading {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== 外卖平台跳转按钮 ===== */
+/* ===== 照片条 ===== */
+.photo-strip {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.photo-thumb {
+  flex: 0 0 100px;
+  height: 75px;
+  border-radius: 8px;
+  overflow: hidden;
+  scroll-snap-align: start;
+  background: #f0f0f0;
+}
+
+.photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+  font-size: 12px;
+}
+
+.food-photo-link {
+  display: block;
+  text-align: center;
+  padding: 8px 0;
+  margin-top: 6px;
+  color: #e8734a;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.food-photo-link:hover {
+  background: #fff5f0;
+}
+
+.platform-links {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.platform-link {
+  flex: 1;
+  display: inline-block;
+  text-align: center;
+  padding: 10px 0;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.platform-link:hover {
+  opacity: 0.85;
+}
+
+.platform-link.meituan {
+  background: #FFD100;
+  color: #333;
+}
+
+.platform-link.eleme {
+  background: #0085FF;
+  color: #fff;
+}
+
+.avg-price {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+/* ===== 推荐菜品标签 ===== */
+.dish-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.dish-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.dish-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  background: #fff5f0;
+  color: var(--primary);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ===== 快捷位置标签 ===== */
+.quick-locations {
+  margin-top: 12px;
+}
+
+/* ===== 忌口计数 ===== */
+.dietary-count {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* ===== 骨架屏 ===== */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+}
+
+.skeleton-title { height: 20px; width: 60%; margin-bottom: 12px; }
+.skeleton-stats { height: 14px; width: 40%; margin-bottom: 12px; }
+.skeleton-tags { height: 24px; width: 80%; margin-bottom: 8px; }
+.skeleton-btn { height: 42px; width: 100%; }
+
+/* ===== 错误状态 ===== */
+.error-banner {
+  text-align: center;
+  padding: 32px 20px;
+}
+
+.error-banner-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.error-banner-text {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 28px;
+  border-radius: 24px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+/* ===== 引导提示 ===== */
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.onboarding-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 24px;
+  margin: 20px;
+  max-width: 340px;
+  text-align: center;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+}
+
+.onboarding-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.onboarding-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.onboarding-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===== 历史记录 ===== */
+.history-section {
+  margin-top: 16px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.history-title {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.history-clear {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.history-clear:hover {
+  background: var(--border);
+}
+
+.history-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.history-chip {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.history-chip:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 480px) {
+  #root {
+    max-width: 100%;
+    box-shadow: none;
+  }
+
+  .page {
+    padding: 20px 16px;
+  }
+
+  .wheel-wrapper {
+    width: 260px;
+    height: 260px;
+  }
+
+  .wheel-svg {
+    width: 260px;
+    height: 260px;
+  }
+
+  .page-title {
+    font-size: 22px;
+  }
+
+  .confirm-buttons {
+    flex-direction: column;
+  }
+}
