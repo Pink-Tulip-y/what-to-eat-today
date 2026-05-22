@@ -1,0 +1,14 @@
+<view class="page">
+  <text class="page-title">转盘结果</text>
+  <text class="page-subtitle">命运选择了...</text>
+
+  <view style="text-align:center;margin-top:60rpx;">
+    <view class="category-badge">{{category}}</view>
+    <text style="display:block;margin-top:28rpx;font-size:28rpx;color:var(--text2);">看起来不错！要搜这类的店吗？</text>
+  </view>
+
+  <view style="margin-top:auto;display:flex;gap:24rpx;">
+    <view class="btn btn-outline" style="flex:1;" bindtap="reroll">再转一次</view>
+    <view class="btn btn-primary" style="flex:1;" bindtap="accept">就吃这个！</view>
+  </view>
+</view>

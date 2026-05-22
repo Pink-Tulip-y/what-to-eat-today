@@ -1,0 +1,17 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/dietary/dietary",
+    "pages/wheel/wheel",
+    "pages/confirm/confirm",
+    "pages/results/results"
+  ],
+  "window": {
+    "navigationBarTitleText": "今天吃什么",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#fafafa"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
