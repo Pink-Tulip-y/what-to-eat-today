@@ -2,5 +2,7 @@ node_modules/
 client/dist/
 .env
 server/.env
+bore.exe
+*.private.*
 *.log
 .DS_Store
