@@ -11,6 +11,9 @@
     "copy:public": "node -e \"const{cpSync,existsSync,mkdirSync}=require('fs');const p='server/public';if(!existsSync(p))mkdirSync(p,{recursive:true});cpSync('client/dist',p,{recursive:true});console.log('OK')\"",
     "start": "npm --prefix server run start"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "concurrently": "^9.1.0"
   }
