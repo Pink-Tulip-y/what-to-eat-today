@@ -1,16 +1,16 @@
 <view class="page">
-  <view class="back-bar"><text class="back-btn" bindtap="goBack">← 返回修改忌口</text></view>
-  <text class="page-title">转盘帮你选！</text>
-  <text class="page-subtitle">点击按钮，让命运决定今天吃什么</text>
+  <view class="back-bar"><text class="back-btn" bindtap="goBack">← 返回</text></view>
+  <text class="page-title">命运转盘</text>
+  <text class="page-subtitle">点击按钮，让命运决定吃什么</text>
 
-  <view class="wheel-outer">
-    <view class="wheel-pointer"></view>
-    <view class="wheel-disc" style="transform: rotate({{rotation}}deg); transition: {{spinning ? 'transform 3.5s cubic-bezier(0.17,0.67,0.12,0.99)' : 'none'}};">
-      <view class="wheel-seg" wx:for="{{segments}}" wx:key="index" style="transform: rotate({{item.rotate}}deg); background: {{item.color}};">
-        <text class="wheel-text">{{item.label}}</text>
+  <view class="wbox">
+    <view class="wpointer"></view>
+    <view class="wdisc" style="background:{{gradient}};transform:rotate({{rotation}}deg);{{spinning ? 'transition:transform 3.5s cubic-bezier(0.17,0.67,0.12,0.99)' : ''}}">
+      <view class="wseg-text" wx:for="{{labels}}" wx:key="idx" style="transform:rotate({{item.angle}}deg)">
+        <text class="wlabel">{{item.name}}</text>
       </view>
     </view>
-    <view class="wheel-center-btn">GO</view>
+    <view class="wcenter">GO</view>
   </view>
 
   <view class="btn btn-primary btn-large" style="margin-top:60rpx;" bindtap="spin">

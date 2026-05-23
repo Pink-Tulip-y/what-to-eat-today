@@ -29,6 +29,12 @@ const frontendPath = fs.existsSync(publicDir) ? publicDir
   : fs.existsSync(clientDist) ? clientDist
   : null;
 
+// 微信验证文件目录 (放 .txt 验证文件)
+const verifyDir = path.join(__dirname, '..', 'verify');
+if (fs.existsSync(verifyDir)) {
+  app.use(express.static(verifyDir, { maxAge: '1d' }));
+}
+
 if (frontendPath) {
   app.use(express.static(frontendPath, { maxAge: '1h' }));
   app.get('*', (_req, res) => {

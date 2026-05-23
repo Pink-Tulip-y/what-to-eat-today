@@ -1,33 +1,36 @@
-// 后端地址 (部署后替换为 Railway/Render 的 HTTPS 地址)
-const BASE = 'https://what-to-eat-today-production-681f.up.railway.app';
+var BASE = 'https://what-to-eat-today-production-681f.up.railway.app';
 
-function searchRestaurants(params) {
-  return new Promise((resolve, reject) => {
-    const qs = [];
-    qs.push('location=' + encodeURIComponent(params.location));
-    qs.push('category=' + encodeURIComponent(params.category));
-    if (params.lat) qs.push('lat=' + params.lat);
-    if (params.lng) qs.push('lng=' + params.lng);
-    if (params.excludes.length > 0) qs.push('excludes=' + encodeURIComponent(params.excludes.join(',')));
-
+function request(url) {
+  return new Promise(function(resolve, reject) {
     wx.request({
-      url: BASE + '/api/restaurants/search?' + qs.join('&'),
+      url: url,
       method: 'GET',
-      success: (res) => resolve(res.data),
-      fail: (err) => reject(err),
+      success: function(res) {
+        if (res.statusCode === 200) {
+          resolve(res.data);
+        } else {
+          reject(new Error('Error ' + res.statusCode));
+        }
+      },
+      fail: function(err) {
+        reject(new Error(err.errMsg || 'Network error'));
+      },
     });
   });
+}
+
+function searchRestaurants(params) {
+  var qs = [];
+  qs.push('location=' + encodeURIComponent(params.location));
+  qs.push('category=' + encodeURIComponent(params.category));
+  if (params.lat) qs.push('lat=' + params.lat);
+  if (params.lng) qs.push('lng=' + params.lng);
+  if (params.excludes.length > 0) qs.push('excludes=' + encodeURIComponent(params.excludes.join(',')));
+  return request(BASE + '/api/restaurants/search?' + qs.join('&'));
 }
 
 function suggestLocation(q) {
-  return new Promise((resolve, reject) => {
-    wx.request({
-      url: BASE + '/api/location/suggest?q=' + encodeURIComponent(q),
-      method: 'GET',
-      success: (res) => resolve(res.data),
-      fail: (err) => reject(err),
-    });
-  });
+  return request(BASE + '/api/location/suggest?q=' + encodeURIComponent(q));
 }
 
-module.exports = { searchRestaurants, suggestLocation };
+module.exports = { searchRestaurants: searchRestaurants, suggestLocation: suggestLocation };

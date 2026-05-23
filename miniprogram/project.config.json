@@ -47,8 +47,8 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
-  "libVersion": "3.5.5",
-  "appid": "wx5ef27269a8896582",
+  "libVersion": "3.16.1",
+  "appid": "wx21379fc3932f9962",
   "projectname": "what-to-eat-today",
   "condition": {},
   "simulatorPluginLibVersion": {},

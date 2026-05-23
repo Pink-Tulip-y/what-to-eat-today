@@ -134,39 +134,35 @@ page {
 
 .dietary-count { text-align: center; margin-top: 28rpx; font-size: 26rpx; color: var(--text2); }
 
-/* 转盘 - CSS 版 */
-.wheel-outer {
-  display: flex; flex-direction: column; align-items: center;
-  margin-top: 60rpx; position: relative;
+/* 转盘 - conic-gradient */
+.wbox { width: 540rpx; height: 540rpx; margin: 60rpx auto 0; position: relative; }
+.wpointer {
+  position: absolute; top: -20rpx; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0; z-index: 10;
+  border-left: 28rpx solid transparent; border-right: 28rpx solid transparent;
+  border-top: 52rpx solid var(--primary);
+  filter: drop-shadow(0 2rpx 4rpx rgba(0,0,0,0.3));
 }
-.wheel-pointer {
-  position: absolute; top: -30rpx; left: 50%; transform: translateX(-50%);
-  width: 0; height: 0; border-left: 28rpx solid transparent; border-right: 28rpx solid transparent;
-  border-top: 56rpx solid var(--primary); z-index: 10;
+.wdisc {
+  width: 540rpx; height: 540rpx; border-radius: 50%; overflow: hidden;
+  position: relative; border: 6rpx solid #fff;
+  box-shadow: 0 8rpx 32rpx rgba(0,0,0,0.15);
 }
-.wheel-disc {
-  width: 520rpx; height: 520rpx; border-radius: 50%; position: relative;
-  overflow: hidden; border: 4rpx solid #fff; box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.12);
+.wseg-text {
+  position: absolute; top: 0; left: 50%; width: 0; height: 100%;
+  display: flex; align-items: flex-start; justify-content: center;
+  transform-origin: 50% 50%;
 }
-.wheel-seg {
-  position: absolute; left: 50%; top: 0; width: 0; height: 0;
-  transform-origin: 50% 260rpx;
-  border-left: 130rpx solid transparent;
-  border-right: 130rpx solid transparent;
-  border-top: 260rpx solid;
+.wlabel {
+  margin-top: 40rpx; font-size: 24rpx; color: #fff; font-weight: 700;
+  white-space: nowrap; text-shadow: 0 1rpx 3rpx rgba(0,0,0,0.3);
 }
-.wheel-text {
-  position: absolute; left: -40rpx; top: -240rpx; width: 80rpx;
-  text-align: center; font-size: 22rpx; color: #fff; font-weight: 700;
-  white-space: nowrap;
-}
-.wheel-center-btn {
+.wcenter {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  width: 110rpx; height: 110rpx; border-radius: 50%; background: #fff;
+  width: 100rpx; height: 100rpx; border-radius: 50%; background: #fff;
   box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.15); display: flex;
   align-items: center; justify-content: center;
   font-weight: 700; font-size: 28rpx; color: var(--primary);
-  z-index: 5; pointer-events: none;
 }
 
 /* 引导弹窗 */
@@ -194,3 +190,5 @@ page {
 
 .custom-row { display: flex; gap: 16rpx; align-items: center; }
 .custom-input { width: 260rpx; padding: 18rpx 24rpx; border: 2rpx solid var(--primary); border-radius: 44rpx; font-size: 28rpx; }
+
+.btn-bottom { margin-top: auto; padding: 40rpx 0 20rpx; width: 100%; box-sizing: border-box; }
