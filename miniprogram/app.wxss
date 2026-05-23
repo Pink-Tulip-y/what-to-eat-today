@@ -134,20 +134,58 @@ page {
 
 .dietary-count { text-align: center; margin-top: 28rpx; font-size: 26rpx; color: var(--text2); }
 
-.wheel-container { display: flex; flex-direction: column; align-items: center; margin-top: 40rpx; }
-.wheel-wrap { position: relative; width: 500rpx; height: 500rpx; }
-.wheel-arrow {
-  position: absolute; top: -20rpx; left: 50%; transform: translateX(-50%);
-  width: 0; height: 0; border-left: 24rpx solid transparent; border-right: 24rpx solid transparent;
-  border-top: 48rpx solid var(--primary); z-index: 10;
+/* 转盘 - CSS 版 */
+.wheel-outer {
+  display: flex; flex-direction: column; align-items: center;
+  margin-top: 60rpx; position: relative;
 }
-.wheel-canvas { width: 500rpx; height: 500rpx; }
-.wheel-center {
+.wheel-pointer {
+  position: absolute; top: -30rpx; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0; border-left: 28rpx solid transparent; border-right: 28rpx solid transparent;
+  border-top: 56rpx solid var(--primary); z-index: 10;
+}
+.wheel-disc {
+  width: 520rpx; height: 520rpx; border-radius: 50%; position: relative;
+  overflow: hidden; border: 4rpx solid #fff; box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.12);
+}
+.wheel-seg {
+  position: absolute; left: 50%; top: 0; width: 0; height: 0;
+  transform-origin: 50% 260rpx;
+  border-left: 130rpx solid transparent;
+  border-right: 130rpx solid transparent;
+  border-top: 260rpx solid;
+}
+.wheel-text {
+  position: absolute; left: -40rpx; top: -240rpx; width: 80rpx;
+  text-align: center; font-size: 22rpx; color: #fff; font-weight: 700;
+  white-space: nowrap;
+}
+.wheel-center-btn {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  width: 100rpx; height: 100rpx; border-radius: 50%; background: #fff;
-  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.15); display: flex; align-items: center;
-  justify-content: center; font-weight: 700; font-size: 28rpx; color: var(--primary);
+  width: 110rpx; height: 110rpx; border-radius: 50%; background: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.15); display: flex;
+  align-items: center; justify-content: center;
+  font-weight: 700; font-size: 28rpx; color: var(--primary);
+  z-index: 5; pointer-events: none;
 }
+
+/* 引导弹窗 */
+.onboard-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 999;
+  display: flex; align-items: center; justify-content: center;
+}
+.onboard-card {
+  background: #fff; border-radius: 32rpx; padding: 56rpx 48rpx;
+  margin: 40rpx; max-width: 560rpx; text-align: center;
+  box-shadow: 0 32rpx 96rpx rgba(0,0,0,0.2);
+}
+.onboard-icon { font-size: 80rpx; margin-bottom: 24rpx; display: block; }
+.onboard-title { font-size: 40rpx; font-weight: 700; margin-bottom: 16rpx; display: block; }
+.onboard-text { font-size: 28rpx; color: var(--text2); line-height: 1.6; margin-bottom: 32rpx; display: block; }
+.onboard-dots { display: flex; gap: 12rpx; justify-content: center; margin-bottom: 32rpx; }
+.onboard-dot { width: 16rpx; height: 16rpx; border-radius: 50%; background: var(--border); }
+.onboard-dot.active { background: var(--primary); }
+.onboard-skip { margin-top: 20rpx; font-size: 26rpx; color: var(--text2); display: block; }
 
 .category-badge {
   display: inline-block; padding: 32rpx 80rpx; border-radius: 48rpx;

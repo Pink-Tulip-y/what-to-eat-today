@@ -4,20 +4,16 @@
   <text class="page-subtitle">选好后自动避开不合口味的食物</text>
 
   <view class="tags">
-    <view wx:for="{{options}}" wx:key="key" class="tag {{selected.indexOf(item.key) > -1 ? 'selected' : ''}}" data-key="{{item.key}}" bindtap="toggle">
-      {{item.label}}
-    </view>
+    <view wx:for="{{options}}" wx:key="key" class="tag {{selected.indexOf(item.key) > -1 ? 'selected' : ''}}" data-key="{{item.key}}" bindtap="toggle">{{item.label}}</view>
 
-    <view wx:for="{{customItems}}" wx:key="*this" class="tag selected" data-item="{{item}}" bindtap="removeCustom">
-      {{item}} ✕
-    </view>
+    <view wx:for="{{customItems}}" wx:key="*this" class="tag selected" data-item="{{item}}" bindtap="removeCustom">{{item}} ✕</view>
 
     <view wx:if="{{showInput}}" class="custom-row">
-      <input class="custom-input" placeholder="输入忌口..." value="{{customVal}}" bindinput="e => customVal = e.detail.value" bindconfirm="addCustom" focus />
-      <view class="btn btn-primary" style="padding:18rpx 32rpx;font-size:26rpx;" bindtap="addCustom">添加</view>
+      <input class="custom-input" placeholder="输入忌口..." value="{{customVal}}" bindinput="onCustomInput" bindconfirm="addCustom" focus />
+      <button class="btn btn-primary" style="padding:18rpx 32rpx;font-size:26rpx;line-height:1;" bindtap="addCustom">添加</button>
     </view>
 
-    <view wx:else class="tag" style="border-style:dashed;color:var(--text2);" bindtap="e => showInput = true">+ 其他</view>
+    <view wx:else class="tag" style="border-style:dashed;color:var(--text2);" bindtap="openInput">+ 其他</view>
   </view>
 
   <view style="margin-top:auto;">

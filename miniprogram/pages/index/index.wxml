@@ -1,3 +1,19 @@
+<!-- 引导弹窗 -->
+<view class="onboard-overlay" wx:if="{{showOnboard}}" bindtap="closeOnboard">
+  <view class="onboard-card" catchtap="stopProp">
+    <view class="onboard-icon">{{steps[onboardStep].icon}}</view>
+    <view class="onboard-title">{{steps[onboardStep].title}}</view>
+    <view class="onboard-text">{{steps[onboardStep].text}}</view>
+    <view class="onboard-dots">
+      <view wx:for="{{steps}}" wx:key="title" class="onboard-dot {{index === onboardStep ? 'active' : ''}}"></view>
+    </view>
+    <view class="btn btn-primary btn-large" wx:if="{{onboardStep < steps.length - 1}}" bindtap="nextStep">下一步</view>
+    <view class="btn btn-primary btn-large" wx:else bindtap="closeOnboard">开始使用</view>
+    <view class="onboard-skip" bindtap="closeOnboard">跳过介绍</view>
+  </view>
+</view>
+
+<!-- 主页面 -->
 <view class="page">
   <text class="page-title">今天吃什么？</text>
   <text class="page-subtitle">输入位置，帮你找到附近最好的外卖</text>
@@ -5,26 +21,22 @@
   <input class="input" placeholder="搜索地点，如：望京SOHO" value="{{query}}" bindinput="onInput" bindconfirm="goNext" />
 
   <view class="suggestions" wx:if="{{suggestions.length > 0}}">
-    <view class="sug-item" wx:for="{{suggestions}}" wx:key="name" data-suggestion="{{item}}" bindtap="onSelect">
+    <view class="sug-item" wx:for="{{suggestions}}" wx:key="index" data-index="{{index}}" bindtap="onSelect">
       <text class="sug-name">{{item.name}}</text>
       <text class="sug-addr">{{item.address}}</text>
     </view>
   </view>
 
-  <text wx:if="{{selected}}" style="color:var(--success);font-size:26rpx;margin-top:20rpx;text-align:center;">
-    已选：{{selected.name}}
-  </text>
+  <text wx:if="{{selected}}" style="color:var(--success);font-size:26rpx;margin-top:20rpx;text-align:center;">已选：{{selected.name}}</text>
 
   <view style="margin-top:auto;padding-top:80rpx;">
-    <view class="btn btn-primary btn-large {{query ? '' : 'disabled'}}" bindtap="goNext">下一步</view>
+    <view class="btn btn-primary btn-large" style="{{query ? '' : 'opacity:0.4'}}" bindtap="goNext">下一步</view>
   </view>
 
   <view class="history" wx:if="{{history.length > 0}}">
     <text class="history-title">最近搜索</text>
     <view class="history-chips">
-      <text class="history-chip" wx:for="{{history}}" wx:key="time" data-history="{{item}}" bindtap="replayHistory">
-        {{item.category}}·{{item.location}}
-      </text>
+      <text class="history-chip" wx:for="{{history}}" wx:key="time" wx:for-item="h" data-location="{{h.location}}" data-category="{{h.category}}" bindtap="replayHistory">{{h.category}}·{{h.location}}</text>
     </view>
   </view>
 </view>

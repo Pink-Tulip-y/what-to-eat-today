@@ -3,15 +3,17 @@
   <text class="page-title">转盘帮你选！</text>
   <text class="page-subtitle">点击按钮，让命运决定今天吃什么</text>
 
-  <view class="wheel-container">
-    <view class="wheel-wrap">
-      <view class="wheel-arrow"></view>
-      <canvas canvas-id="wheelCanvas" class="wheel-canvas" style="transform:rotate({{rotation}}deg);transition:{{spinning ? 'transform 3.5s cubic-bezier(0.17,0.67,0.12,0.99)' : 'none'}};"></canvas>
-      <view class="wheel-center">GO</view>
+  <view class="wheel-outer">
+    <view class="wheel-pointer"></view>
+    <view class="wheel-disc" style="transform: rotate({{rotation}}deg); transition: {{spinning ? 'transform 3.5s cubic-bezier(0.17,0.67,0.12,0.99)' : 'none'}};">
+      <view class="wheel-seg" wx:for="{{segments}}" wx:key="index" style="transform: rotate({{item.rotate}}deg); background: {{item.color}};">
+        <text class="wheel-text">{{item.label}}</text>
+      </view>
     </view>
+    <view class="wheel-center-btn">GO</view>
   </view>
 
   <view class="btn btn-primary btn-large" style="margin-top:60rpx;" bindtap="spin">
-    {{spinning ? '转盘中...' : '🎯 开始转动'}}
+    {{spinning ? '转盘中...' : (hasSpun ? '再转一次' : '🎯 开始转动')}}
   </view>
 </view>

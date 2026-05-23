@@ -1,5 +1,5 @@
 // 后端地址 (部署后替换为 Railway/Render 的 HTTPS 地址)
-const BASE = 'http://bore.pub:63752';
+const BASE = 'https://what-to-eat-today-production-681f.up.railway.app';
 
 function searchRestaurants(params) {
   return new Promise((resolve, reject) => {
