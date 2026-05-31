@@ -1,4 +1,5 @@
-// 简单的内存 TTL 缓存
+﻿// 缓存服务
+// 简单内存 TTL 缓存
 
 interface CacheEntry<T> {
   data: T;

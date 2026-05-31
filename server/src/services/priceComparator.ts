@@ -1,4 +1,4 @@
-import { PlatformInfo } from '../data/mockData';
+﻿import { PlatformInfo } from "../data/mockData";
 
 export interface PlatformComparison {
   platform: PlatformInfo;
@@ -23,6 +23,7 @@ export function comparePlatforms(platforms: PlatformInfo[]): PlatformComparison[
     }
   }
 
+  // 标记最便宜
   for (const c of comparisons) {
     c.isCheapest = c.effectivePrice === minPrice;
   }
@@ -31,7 +32,7 @@ export function comparePlatforms(platforms: PlatformInfo[]): PlatformComparison[
 }
 
 function parseDiscount(discount: string): number {
-  // 解析 "满30减8" → 8, "满50减18" → 18, "新用户减15" → 15
+  // 解析 "满30减8" → 8, "满40减18" → 18, "新用户减15" → 15, "会员免配送" → 0
   const match = discount.match(/减(\d+)/);
   return match ? parseInt(match[1], 10) : 0;
 }

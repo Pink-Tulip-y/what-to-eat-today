@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
-import type { Restaurant, SearchResponse, SelectedLocation } from '../types';
-import { searchPoiDirect } from '../amapDirect';
-import ResultCard from './ResultCard';
+﻿import { useEffect, useState, useRef, useCallback } from "react";
+import type { Restaurant, SearchResponse, SelectedLocation } from "../types";
+import { searchPoiDirect } from "../amapDirect";
+import ResultCard from "./ResultCard";
 
 interface Props {
   location: SelectedLocation;
@@ -34,40 +34,48 @@ function SkeletonList() {
 
 export default function RestaurantList({ location, category, excludes, onBack, onRestart }: Props) {
   const [results, setResults] = useState<Restaurant[]>([]);
-  const [source, setSource] = useState<string>('');
+  const [source, setSource] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
+  const abortRef = useRef<AbortController | null>(null);
 
   const fetchResults = useCallback(() => {
+    // 取消上一次请求
+    if (abortRef.current) abortRef.current.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
-    setError('');
+    setError("");
 
     const params = new URLSearchParams();
-    params.set('location', location.name);
-    params.set('category', category);
+    params.set("location", location.name);
+    params.set("category", category);
     if (location.lat && location.lng) {
-      params.set('lat', String(location.lat));
-      params.set('lng', String(location.lng));
+      params.set("lat", String(location.lat));
+      params.set("lng", String(location.lng));
     }
-    if (excludes.length > 0) params.set('excludes', excludes.join(','));
+    if (excludes.length > 0) params.set("excludes", excludes.join(","));
 
-    fetch(`/api/restaurants/search?${params.toString()}`)
+    fetch(`/api/restaurants/search?${params.toString()}`, { signal: controller.signal })
       .then((res) => {
-        if (!res.ok) throw new Error('服务器错误');
+        if (!res.ok) throw new Error("服务器错误");
         return res.json();
       })
       .then(async (data: SearchResponse) => {
-        // 后端返回空或mock数据时，浏览器直连高德（绕过Railway美国IP限制）
+        if (controller.signal.aborted) return;
+
+        // 后端返回空或 mock 数据时，浏览器直连高德（绕过 Railway 美国 IP 限制）
         if (
-          (data.results.length === 0 || data.source === 'mock') &&
+          (data.results.length === 0 || data.source === "mock") &&
           location.lat && location.lng &&
           location.lat !== 0 && location.lng !== 0
         ) {
           try {
             const direct = await searchPoiDirect(location.lng, location.lat, category);
-            if (direct.length > 0) {
+            if (!controller.signal.aborted && direct.length > 0) {
               setResults(direct);
-              setSource('amap');
+              setSource("amap");
               setLoading(false);
               return;
             }
@@ -79,7 +87,8 @@ export default function RestaurantList({ location, category, excludes, onBack, o
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.message || '网络连接失败');
+        if (err.name === "AbortError") return;
+        setError(err.message || "网络连接失败");
         setResults([]);
         setLoading(false);
       });
@@ -87,6 +96,9 @@ export default function RestaurantList({ location, category, excludes, onBack, o
 
   useEffect(() => {
     fetchResults();
+    return () => {
+      if (abortRef.current) abortRef.current.abort();
+    };
   }, [fetchResults]);
 
   return (
@@ -98,17 +110,17 @@ export default function RestaurantList({ location, category, excludes, onBack, o
       </div>
 
       <h1 className="page-title">
-        {category} · {location.name.length > 12 ? location.name.slice(0, 12) + '...' : location.name}
+        {category} · {location.name.length > 12 ? location.name.slice(0, 12) + "..." : location.name}
       </h1>
       <p className="page-subtitle">
-        {loading ? '正在搜索...' : source === 'amap' ? '高德地图实时数据' : '综合评分高 + 销量高'}
+        {loading ? "正在搜索..." : source === "amap" ? "高德地图实时数据" : "综合评分高 + 销量高"}
       </p>
 
       {loading ? (
         <SkeletonList />
       ) : error ? (
         <div className="error-banner">
-          <div className="error-banner-icon">😵</div>
+          <div className="error-banner-icon">🙀</div>
           <p className="error-banner-text">{error}</p>
           <button className="retry-btn" onClick={fetchResults}>
             ↻ 点击重试
@@ -116,14 +128,14 @@ export default function RestaurantList({ location, category, excludes, onBack, o
         </div>
       ) : results.length === 0 ? (
         <div className="error-banner">
-          <div className="error-banner-icon">🔍</div>
+          <div className="error-banner-icon">🔳</div>
           <p className="error-banner-text">
             附近没有找到符合条件的{category}
           </p>
-          <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>
+          <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 20 }}>
             试试换个类别、扩大范围或调整忌口
           </p>
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div style={{ display: "flex", gap: 12 }}>
             <button className="btn btn-outline" onClick={onBack} type="button">
               换一类
             </button>
@@ -142,7 +154,7 @@ export default function RestaurantList({ location, category, excludes, onBack, o
               <ResultCard key={r.id} restaurant={r} />
             ))}
           </div>
-          <div style={{ marginTop: 24, display: 'flex', gap: 12 }}>
+          <div style={{ marginTop: 24, display: "flex", gap: 12 }}>
             <button
               className="btn btn-outline"
               style={{ flex: 1 }}

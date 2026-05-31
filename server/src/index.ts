@@ -1,4 +1,4 @@
-import 'dotenv/config';
+﻿import 'dotenv/config';
 import express from 'express';
 import compression from 'compression';
 import cors from 'cors';
@@ -19,6 +19,13 @@ app.use('/api/restaurants', restaurantRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
+});
+
+// 安全提供前端所需的配置（不暴露完整 .env）
+app.get('/api/config/key', (_req, res) => {
+  res.json({
+    amapKey: process.env.AMAP_KEY || ''
+  });
 });
 
 // 生产模式：提供前端静态文件（server/public）

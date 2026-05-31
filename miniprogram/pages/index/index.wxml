@@ -1,1 +1,122 @@
-<web-view src="https://short-cooks-stand.loca.lt"></web-view>
+﻿<!-- pages/index/index.wxml -->
+<view class="page">
+
+  <!-- 步骤 1：选地点 -->
+  <view wx:if="{{step === 'location'}}" class="step-location">
+    <text class="page-title">今天吃什么？</text>
+    <text class="page-subtitle">输入地点，帮你找附近的好外卖</text>
+
+    <view class="search-row">
+      <input class="location-input"
+        placeholder="搜索地点，如：北京大学、望京SOHO..."
+        value="{{query}}"
+        bindinput="onInput"
+        auto-focus
+      />
+      <button class="gps-btn" bindtap="onGPS" loading="{{gpsLoading}}">
+        {{gpsLoading ? '...' : '📍 定位'}}
+      </button>
+    </view>
+
+    <!-- 建议列表 -->
+    <view wx:if="{{suggestions.length > 0}}" class="suggestions-list">
+      <view wx:for="{{suggestions}}" wx:key="index"
+        class="suggestion-item"
+        data-index="{{index}}"
+        bindtap="onSelect"
+      >
+        <text class="sug-name">{{item.name}}</text>
+        <text class="sug-addr">{{item.address}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{selected}}" class="selected-hint">
+      已选择：{{selected.name}}
+    </view>
+
+    <button class="btn-primary" bindtap="onSubmit" disabled="{{!query}}">
+      下一步
+    </button>
+  </view>
+
+  <!-- 步骤 2：忌口 -->
+  <view wx:if="{{step === 'dietary'}}" class="step-diet">
+    <view class="back-bar">
+      <text class="back-btn" bindtap="onRestart">← 返回</text>
+    </view>
+
+    <text class="page-title">有什么忌口吗？</text>
+    <text class="page-subtitle">选好后我们会自动避开不合口味的食物</text>
+
+    <view class="diet-tags">
+      <block wx:for="{{['辣','海鲜','猪肉','牛肉','羊肉','素食','清真']}}" wx:key="*this">
+        <view class="diet-tag {{excludes.indexOf(item) >= 0 ? 'selected' : ''}}"
+          data-key="{{item}}"
+          bindtap="onToggleDiet"
+        >
+          {{item}}
+        </view>
+      </block>
+    </view>
+
+    <text class="diet-count">已选 {{excludes.length}} 项忌口</text>
+
+    <button class="btn-primary" bindtap="onDietNext">
+      下一步，转盘来决定！
+    </button>
+  </view>
+
+  <!-- 步骤 3：确认 -->
+  <view wx:if="{{step === 'confirm'}}" class="step-confirm">
+    <text class="page-title">今日推荐</text>
+    <text class="page-subtitle">随机选择了...</text>
+
+    <view class="category-result">
+      <text class="category-badge">{{category}}</text>
+      <text class="category-guess">看起来不错！要搜这类的店吗？</text>
+    </view>
+
+    <button class="btn-outline" bindtap="onConfirmBack">再换一个</button>
+    <button class="btn-primary" bindtap="onConfirmGo">就吃这个！</button>
+  </view>
+
+  <!-- 步骤 4：结果 -->
+  <view wx:if="{{step === 'results'}}" class="step-results">
+    <view class="back-bar">
+      <text class="back-btn" bindtap="onBackToWheel">← 换一类</text>
+    </view>
+
+    <text class="page-title">{{category}} · {{selected.name}}</text>
+    <text class="page-subtitle">{{source === 'amap' ? '高德实时数据' : '综合评分'}}</text>
+
+    <view wx:if="{{loading}}" class="loading-text">搜索中...</view>
+
+    <view wx:elif="{{error}}" class="error-box">
+      <text>{{error}}</text>
+      <button class="btn-outline" bindtap="onConfirmGo">重试</button>
+    </view>
+
+    <view wx:elif="{{results.length === 0}}" class="error-box">
+      <text>附近没找到{{category}}，换一类试试</text>
+    </view>
+
+    <view wx:else class="result-list">
+      <view wx:for="{{results}}" wx:key="id" class="result-card">
+        <view class="result-header">
+          <text class="result-name">{{item.name}}</text>
+        </view>
+        <view class="result-stats">
+          <text wx:if="{{item.rating > 0}}" class="stat-rating">★ {{item.rating}}</text>
+          <text wx:if="{{item.monthlySales > 0}}" class="stat-sales">{{item.monthlySales}}单/月</text>
+          <text wx:if="{{item.distance > 0}}" class="stat-dist">{{item.distance}}km</text>
+        </view>
+        <view wx:if="{{item.platforms.length > 0 && item.platforms[0].estimatedPrice > 0}}" class="avg-price">
+          人均 ¥{{item.platforms[0].estimatedPrice}}
+        </view>
+      </view>
+    </view>
+
+    <button class="btn-primary" bindtap="onRestart">重新开始</button>
+  </view>
+
+</view>

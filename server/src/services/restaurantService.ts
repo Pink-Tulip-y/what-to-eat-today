@@ -1,5 +1,5 @@
-import restaurants, { Restaurant } from '../data/mockData';
-import { geocode, searchPoi, filterByRating, AmapPoi } from './amapService';
+﻿import restaurants, { Restaurant } from "../data/mockData";
+import { geocode, searchPoi, filterByRating, AmapPoi } from "./amapService";
 
 interface SearchParams {
   location: string;
@@ -10,7 +10,7 @@ interface SearchParams {
 }
 
 export interface SearchResult {
-  source: 'amap' | 'mock';
+  source: "amap" | "mock";
   location: {
     input: string;
     resolved?: string;
@@ -24,43 +24,64 @@ export interface SearchResult {
 const NON_DISH = /^(川菜|粤菜|日料|韩餐|烧烤|火锅|快餐|面食|小吃|西餐|东南亚菜|东北菜|中餐|外国餐厅|茶点|串串|宵夜|早餐|快捷|经济实惠|服务好|一人食|高端|新颖|清真|素食|家常|融合菜|烤鱼|麻辣烫)$/;
 
 function parseDishes(tag: unknown): string[] {
-  if (!tag || typeof tag !== 'string') return [];
+  if (!tag || typeof tag !== "string") return [];
   return tag
-    .split(',')
+    .split(",")
     .map((s) => s.trim())
     .filter((s) => s.length > 1 && s.length <= 8 && !NON_DISH.test(s))
     .slice(0, 6);
 }
 
+/** 从 address 或 location 解析城市和行政区 */
+function parseCityDistrict(p: AmapPoi): { city: string; district: string } {
+  const addr = (p.address || "").trim();
+  // 城市后缀
+  const cityMatch = addr.match(/^(北京|上海|广州|深圳|杭州|成都|武汉|南京|重庆|西安|长沙|天津|苏州|郑州)市?/);
+  // 区后缀
+  const districtMatch = addr.match(/(朝阳区|海淀区|西城区|东城区|丰台区|浦东新区|徐汇区|静安区|天河区|越秀区|福田区|南山区|西湖区|锦江区|洪山区|秦淮区|渝中区|碑林区|天心区)/);
+  return {
+    city: cityMatch ? cityMatch[1] : "",
+    district: districtMatch ? districtMatch[1] : "",
+  };
+}
+
 function amapPoiToRestaurant(p: AmapPoi, category: string): Restaurant {
+  const { city, district } = parseCityDistrict(p);
+  const tags: string[] = [];
+  if (typeof p.tag === "string") {
+    p.tag.split(",").forEach((t) => {
+      const trimmed = t.trim();
+      if (trimmed && !NON_DISH.test(trimmed)) tags.push(trimmed);
+    });
+  }
   return {
     id: p.id,
     name: p.name,
     category,
-    city: '',
-    district: '',
-    rating: parseFloat(p.biz_ext?.rating || '0') || 0,
+    city,
+    district,
+    rating: parseFloat(p.biz_ext?.rating || "0") || 0,
     monthlySales: 0,
     distance: Math.round((p.distance / 1000) * 10) / 10,
     platforms: [
       {
-        platform: '美团',
+        platform: "美团",
         deliveryFee: 0,
         minOrder: 0,
-        discount: '',
-        estimatedPrice: parseFloat(p.biz_ext?.cost || '0') || 0,
+        discount: "",
+        estimatedPrice: parseFloat(p.biz_ext?.cost || "0") || 0,
         deliveryTime: 0,
       },
       {
-        platform: '饿了么',
+        platform: "饿了么",
         deliveryFee: 0,
         minOrder: 0,
-        discount: '',
-        estimatedPrice: parseFloat(p.biz_ext?.cost || '0') || 0,
+        discount: "",
+        estimatedPrice: parseFloat(p.biz_ext?.cost || "0") || 0,
         deliveryTime: 0,
       },
     ],
-    tags: [],
+    tags,
     dishes: parseDishes(p.tag),
     photos: p.photos || [],
   };
@@ -92,17 +113,22 @@ export async function searchRestaurants(params: SearchParams): Promise<SearchRes
     if (filtered.length > 0) {
       const results = filtered.map((p) => amapPoiToRestaurant(p, category));
 
-      // 忌口过滤
+      // 忌口过滤——优先用 tags，其次用 dishes
       const finalResults = excludes.length > 0
-        ? results.filter((r) =>
-            !r.tags.some((tag) =>
-              excludes.some((ex) => tag.toLowerCase().includes(ex.toLowerCase())),
-            ),
-          )
+        ? results.filter((r) => {
+            // 检查 tags 和 dishes 中是否包含忌口词
+            const allWords = [...r.tags, ...r.dishes].map((w) => w.toLowerCase());
+            return !excludes.some((ex) =>
+              allWords.some((w) => w.includes(ex.toLowerCase()))
+            );
+          })
         : results;
 
+      // 按评分排序
+      finalResults.sort((a, b) => b.rating - a.rating);
+
       return {
-        source: 'amap',
+        source: "amap",
         location: {
           input: location,
           lat: coord.lat,
@@ -149,7 +175,7 @@ export async function searchRestaurants(params: SearchParams): Promise<SearchRes
   });
 
   return {
-    source: 'mock',
+    source: "mock",
     location: { input: location },
     results,
   };

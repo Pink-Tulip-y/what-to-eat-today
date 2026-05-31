@@ -1,16 +1,19 @@
-import { useState, useRef, useEffect } from 'react';
-import type { LocationSuggestion, SelectedLocation } from '../types';
+﻿import { useState, useRef, useEffect } from "react";
+import type { LocationSuggestion, SelectedLocation } from "../types";
 
 interface Props {
   onNext: (location: SelectedLocation) => void;
 }
 
+const INPUT_TIPS_KEY = "4d9e35726103bd11095929ee54899a4e";
+
 export default function LocationInput({ onNext }: Props) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<SelectedLocation | null>(null);
   const [loading, setLoading] = useState(false);
+  const [gpsLoading, setGpsLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -21,8 +24,8 @@ export default function LocationInput({ onNext }: Props) {
         setOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   const handleInput = (value: string) => {
@@ -39,33 +42,32 @@ export default function LocationInput({ onNext }: Props) {
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
       try {
-        // 1) 优先浏览器直连高德（中国IP，返回最全的实时建议）
+        // 输入提示只能直连高德（需要来源 IP）
         const direct = await fetch(
-          `https://restapi.amap.com/v3/assistant/inputtips?key=4d9e35726103bd11095929ee54899a4e&keywords=${encodeURIComponent(value.trim())}&city=`
+          `https://restapi.amap.com/v3/assistant/inputtips?key=${INPUT_TIPS_KEY}&keywords=${encodeURIComponent(value.trim())}&city=`
         );
         const amap = await direct.json();
-        if (amap.status === '1' && amap.tips?.length > 0) {
+        if (amap.status === "1" && amap.tips?.length > 0) {
           const mapped = amap.tips
-            .filter((t: any) => t.location && t.location !== '[]')
+            .filter((t: any) => t.location && t.location !== "[]")
             .map((t: any) => ({
               name: t.name,
-              address: Array.isArray(t.address) ? (t.address[0] || t.district || '') : (t.address || t.district || ''),
-              location: typeof t.location === 'string' ? t.location : '',
-              city: Array.isArray(t.city) ? (t.city[0] || '') : (t.city || ''),
-              district: t.district || '',
+              address: Array.isArray(t.address) ? (t.address[0] || t.district || "") : (t.address || t.district || ""),
+              location: typeof t.location === "string" ? t.location : "",
+              city: Array.isArray(t.city) ? (t.city[0] || "") : (t.city || ""),
+              district: t.district || "",
             }));
           setSuggestions(mapped.slice(0, 8));
           setOpen(true);
           return;
         }
 
-        // 2) 高德无结果时，走后端（本地兜底数据库）
+        // 高德无结果或 Key 无效时，走后端本地兜底数据库
         const res = await fetch(`/api/location/suggest?q=${encodeURIComponent(value.trim())}`);
         const data = await res.json();
         setSuggestions(data.suggestions || []);
         setOpen((data.suggestions || []).length > 0);
       } catch {
-        // 3) 网络错误时，最后试后端
         try {
           const res = await fetch(`/api/location/suggest?q=${encodeURIComponent(value.trim())}`);
           const data = await res.json();
@@ -81,7 +83,7 @@ export default function LocationInput({ onNext }: Props) {
   };
 
   const handleSelect = (s: LocationSuggestion) => {
-    const [lng, lat] = s.location.split(',').map(Number);
+    const [lng, lat] = s.location.split(",").map(Number);
     setSelected({ name: s.name, lat, lng });
     setQuery(s.name);
     setOpen(false);
@@ -97,6 +99,42 @@ export default function LocationInput({ onNext }: Props) {
     }
   };
 
+  // GPS 定位
+  const handleGPS = () => {
+    if (!navigator.geolocation) {
+      alert("当前浏览器不支持定位");
+      return;
+    }
+    setGpsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setGpsLoading(false);
+        // 用高德逆地理编码获取地址名
+        try {
+          const res = await fetch(
+            `https://restapi.amap.com/v3/geocode/regeo?key=${INPUT_TIPS_KEY}&location=${longitude},${latitude}`
+          );
+          const data = await res.json();
+          if (data.status === "1" && data.regeocode) {
+            const addr = data.regeocode.formatted_address || `${latitude.toFixed(4)},${longitude.toFixed(4)}`;
+            setSelected({ name: addr, lat: latitude, lng: longitude });
+            setQuery(addr);
+            return;
+          }
+        } catch { /* ignore */ }
+        // 降级：直接用坐标
+        setSelected({ name: `${latitude.toFixed(4)},${longitude.toFixed(4)}`, lat: latitude, lng: longitude });
+        setQuery(`${latitude.toFixed(4)},${longitude.toFixed(4)}`);
+      },
+      () => {
+        setGpsLoading(false);
+        alert("定位失败，请手动输入地址");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
   return (
     <div className="page">
       <h1 className="page-title">今天吃什么？</h1>
@@ -104,16 +142,35 @@ export default function LocationInput({ onNext }: Props) {
 
       <form onSubmit={handleSubmit}>
         <div className="search-wrapper" ref={wrapperRef}>
-          <input
-            className="location-input"
-            type="text"
-            placeholder="搜索地点，如：北京大学、望京SOHO..."
-            value={query}
-            onChange={(e) => handleInput(e.target.value)}
-            onFocus={() => { if (suggestions.length > 0) setOpen(true); }}
-            autoFocus
-            autoComplete="off"
-          />
+          <div style={{ display: "flex", gap: 8 }}>
+            <input
+              className="location-input"
+              type="text"
+              placeholder="搜索地点，如：北京大学、望京SOHO..."
+              value={query}
+              onChange={(e) => handleInput(e.target.value)}
+              onFocus={() => { if (suggestions.length > 0) setOpen(true); }}
+              autoFocus
+              autoComplete="off"
+              style={{ flex: 1 }}
+            />
+            <button
+              type="button"
+              className="btn"
+              onClick={handleGPS}
+              disabled={gpsLoading}
+              style={{
+                padding: "0 16px",
+                whiteSpace: "nowrap",
+                fontSize: 14,
+                borderRadius: "var(--radius)",
+                background: "var(--border)",
+                color: "var(--text)",
+              }}
+            >
+              {gpsLoading ? "定位中..." : "📍 定位"}
+            </button>
+          </div>
           {loading && <span className="search-spinner" />}
 
           {open && suggestions.length > 0 && (
