@@ -118,12 +118,6 @@ export async function searchRestaurants(params: SearchParams): Promise<SearchRes
     if (category && !r.category.includes(category) && !category.includes(r.category)) {
       return false;
     }
-    if (location) {
-      const loc = location.toLowerCase();
-      const matchCity = r.city.toLowerCase().includes(loc) || loc.includes(r.city.toLowerCase());
-      const matchDistrict = r.district.toLowerCase().includes(loc) || loc.includes(r.district.toLowerCase());
-      if (!matchCity && !matchDistrict) return false;
-    }
     if (excludes.length > 0) {
       const hasExcluded = r.tags.some((tag) =>
         excludes.some((ex) => tag.toLowerCase().includes(ex.toLowerCase())),
@@ -132,6 +126,20 @@ export async function searchRestaurants(params: SearchParams): Promise<SearchRes
     }
     return true;
   });
+
+  // 地点匹配：能匹配城市/行政区则优先，否则返回全部结果
+  let locationMatched = results.filter((r) => {
+    if (!location) return true;
+    const loc = location.toLowerCase();
+    const matchCity = r.city.toLowerCase().includes(loc) || loc.includes(r.city.toLowerCase());
+    const matchDistrict = r.district.toLowerCase().includes(loc) || loc.includes(r.district.toLowerCase());
+    return matchCity || matchDistrict;
+  });
+
+  // 如果地点匹配到了就用，否则用全部（避免用户输入地标名如"望京SOHO"时返回空）
+  if (locationMatched.length > 0) {
+    results = locationMatched;
+  }
 
   const maxSales = Math.max(...results.map((r) => r.monthlySales), 1);
   results.sort((a, b) => {
