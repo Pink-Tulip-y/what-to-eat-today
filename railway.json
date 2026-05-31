@@ -6,5 +6,8 @@
   "deploy": {
     "startCommand": "npm start",
     "restartPolicyType": "ON_FAILURE"
+  },
+  "variables": {
+    "AMAP_KEY": "4d9e35726103bd11095929ee54899a4e"
   }
 }
