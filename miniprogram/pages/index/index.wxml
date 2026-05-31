@@ -1,13 +1,1 @@
-<view class="page">
-  <text class="page-title">今天吃什么？</text>
-  <input class="input" placeholder="搜索地点，望京SOHO..." value="{{query}}" bindinput="onInput" bindconfirm="goNext" />
-  <view class="suggestions" wx:if="{{suggestions.length > 0}}">
-    <view class="sug-item" wx:for="{{suggestions}}" wx:key="index" data-index="{{index}}" bindtap="onSelect">
-      <text class="sug-name">{{item.name}}</text>
-      <text class="sug-addr">{{item.address}}</text>
-    </view>
-  </view>
-  <view class="btn-bottom">
-    <view class="btn btn-primary btn-large" style="{{query ? '' : 'opacity:0.4'}}" bindtap="goNext">下一步</view>
-  </view>
-</view>
+<web-view src="https://short-cooks-stand.loca.lt"></web-view>
