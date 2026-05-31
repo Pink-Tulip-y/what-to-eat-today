@@ -39,37 +39,41 @@ export default function LocationInput({ onNext }: Props) {
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
       try {
-        // 1) 先走后端代理（Railway 有美国 IP 可能被高德拦截）
-        const res = await fetch(`/api/location/suggest?q=${encodeURIComponent(value.trim())}`);
-        const data = await res.json();
-        const backendResults = data.suggestions || [];
-
-        // 2) 后端返回为空或明显是本地兜底数据时，浏览器直连高德（国内 IP 正常）
-        if (backendResults.length === 0) {
-          const direct = await fetch(
-            `https://restapi.amap.com/v3/assistant/inputtips?key=4d9e35726103bd11095929ee54899a4e&keywords=${encodeURIComponent(value.trim())}&city=`
-          );
-          const amap = await direct.json();
-          if (amap.status === '1' && amap.tips?.length > 0) {
-            const mapped = amap.tips
-              .filter((t: any) => t.location && t.location !== '[]')
-              .map((t: any) => ({
-                name: t.name,
-                address: t.address || '',
-                location: t.location,
-                city: t.city || '',
-                district: t.district || '',
-              }));
-            setSuggestions(mapped);
-            setOpen(mapped.length > 0);
-            return;
-          }
+        // 1) 优先浏览器直连高德（中国IP，返回最全的实时建议）
+        const direct = await fetch(
+          `https://restapi.amap.com/v3/assistant/inputtips?key=4d9e35726103bd11095929ee54899a4e&keywords=${encodeURIComponent(value.trim())}&city=`
+        );
+        const amap = await direct.json();
+        if (amap.status === '1' && amap.tips?.length > 0) {
+          const mapped = amap.tips
+            .filter((t: any) => t.location && t.location !== '[]')
+            .map((t: any) => ({
+              name: t.name,
+              address: Array.isArray(t.address) ? (t.address[0] || t.district || '') : (t.address || t.district || ''),
+              location: typeof t.location === 'string' ? t.location : '',
+              city: Array.isArray(t.city) ? (t.city[0] || '') : (t.city || ''),
+              district: t.district || '',
+            }));
+          setSuggestions(mapped.slice(0, 8));
+          setOpen(true);
+          return;
         }
 
-        setSuggestions(backendResults);
-        setOpen(backendResults.length > 0);
+        // 2) 高德无结果时，走后端（本地兜底数据库）
+        const res = await fetch(`/api/location/suggest?q=${encodeURIComponent(value.trim())}`);
+        const data = await res.json();
+        setSuggestions(data.suggestions || []);
+        setOpen((data.suggestions || []).length > 0);
       } catch {
-        setSuggestions([]);
+        // 3) 网络错误时，最后试后端
+        try {
+          const res = await fetch(`/api/location/suggest?q=${encodeURIComponent(value.trim())}`);
+          const data = await res.json();
+          setSuggestions(data.suggestions || []);
+          setOpen((data.suggestions || []).length > 0);
+        } catch {
+          setSuggestions([]);
+        }
       } finally {
         setLoading(false);
       }
