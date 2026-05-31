@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import type { Restaurant, SearchResponse, SelectedLocation } from '../types';
+import { searchPoiDirect } from '../amapDirect';
 import ResultCard from './ResultCard';
 
 interface Props {
@@ -55,7 +56,24 @@ export default function RestaurantList({ location, category, excludes, onBack, o
         if (!res.ok) throw new Error('服务器错误');
         return res.json();
       })
-      .then((data: SearchResponse) => {
+      .then(async (data: SearchResponse) => {
+        // 后端返回空或mock数据时，浏览器直连高德（绕过Railway美国IP限制）
+        if (
+          (data.results.length === 0 || data.source === 'mock') &&
+          location.lat && location.lng &&
+          location.lat !== 0 && location.lng !== 0
+        ) {
+          try {
+            const direct = await searchPoiDirect(location.lng, location.lat, category);
+            if (direct.length > 0) {
+              setResults(direct);
+              setSource('amap');
+              setLoading(false);
+              return;
+            }
+          } catch { /* 直连失败，用后端返回值 */ }
+        }
+
         setResults(data.results || []);
         setSource(data.source);
         setLoading(false);
