@@ -39,10 +39,35 @@ export default function LocationInput({ onNext }: Props) {
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
       try {
+        // 1) 先走后端代理（Railway 有美国 IP 可能被高德拦截）
         const res = await fetch(`/api/location/suggest?q=${encodeURIComponent(value.trim())}`);
         const data = await res.json();
-        setSuggestions(data.suggestions || []);
-        setOpen((data.suggestions || []).length > 0);
+        const backendResults = data.suggestions || [];
+
+        // 2) 后端返回为空或明显是本地兜底数据时，浏览器直连高德（国内 IP 正常）
+        if (backendResults.length === 0) {
+          const direct = await fetch(
+            `https://restapi.amap.com/v3/assistant/inputtips?key=4d9e35726103bd11095929ee54899a4e&keywords=${encodeURIComponent(value.trim())}&city=`
+          );
+          const amap = await direct.json();
+          if (amap.status === '1' && amap.tips?.length > 0) {
+            const mapped = amap.tips
+              .filter((t: any) => t.location && t.location !== '[]')
+              .map((t: any) => ({
+                name: t.name,
+                address: t.address || '',
+                location: t.location,
+                city: t.city || '',
+                district: t.district || '',
+              }));
+            setSuggestions(mapped);
+            setOpen(mapped.length > 0);
+            return;
+          }
+        }
+
+        setSuggestions(backendResults);
+        setOpen(backendResults.length > 0);
       } catch {
         setSuggestions([]);
       } finally {
